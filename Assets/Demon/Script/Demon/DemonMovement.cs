@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DemonMovement : MonoBehaviour
@@ -14,7 +15,7 @@ public class DemonMovement : MonoBehaviour
     Animator MAnimator;
 
     void Start() {
-        MPlayerSpeed = 5.0f;  // 調整速度
+        MPlayerSpeed = 7.0f;  // 調整速度
         MPlayerJumpForce = 5.0f;
         MMouseSensitivity = 750.0f;
 
@@ -25,14 +26,19 @@ public class DemonMovement : MonoBehaviour
     }
 
     void Update() {
+        AnimatorStateInfo mStateInfo = MAnimator.GetCurrentAnimatorStateInfo(0);
         float mMoveHorizontal = Input.GetAxis("Horizontal");
         float mMoveVertical = Input.GetAxis("Vertical");
         float mMoveMouseX = Input.GetAxis("Mouse X") * MMouseSensitivity * Time.deltaTime;
         float mMoveMouseY = Input.GetAxis("Mouse Y") * MMouseSensitivity * Time.deltaTime;
 
-        Vector3 mRight = mCameraTransform.right;
-        Vector3 mForward = mCameraTransform.forward;
+        Vector3 mRight = transform.right;
+        Vector3 mForward = transform.forward;
         Vector3 mMovement = (mMoveHorizontal * mRight + mMoveVertical * mForward).normalized;
+
+        if(mStateInfo.IsName("Stand To Roll")) {
+            mRb.MovePosition(transform.position + 10.0f * Time.deltaTime * mForward);
+        }
         if(Input.GetKeyDown(KeyCode.LeftShift)) {
             MAnimator.SetBool("isShift", true);
         }
@@ -51,15 +57,16 @@ public class DemonMovement : MonoBehaviour
         mRotationX -= mMoveMouseY;
         mRotationY += mMoveMouseX;
         mRotationX = Mathf.Clamp(mRotationX, -90.0f, 90.0f);
+        // camera rotate
         mCameraTransform.localRotation = Quaternion.Euler(mRotationX, 0.0f, 0.0f);
+
+        // gameobject rotate
         transform.localRotation = Quaternion.Euler(0.0f, mRotationY, 0.0f);
 
+        // jump
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
             mRb.AddForce(MPlayerJumpForce * Vector3.up, ForceMode.Impulse);
-            isGrounded = false;
-            MAnimator.SetBool("isGrounded", false);
         }
-        
     }
 
     void OnCollisionEnter(Collision collision) {
