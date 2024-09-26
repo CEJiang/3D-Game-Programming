@@ -57,7 +57,7 @@ public class DemonMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded) {
             mRb.AddForce(MPlayerJumpForce * Vector3.up, ForceMode.Impulse);
             isGrounded = false;
-            MAnimator.SetBool("isGround", false);
+            MAnimator.SetBool("isGrounded", false);
         }
         
     }
@@ -65,14 +65,14 @@ public class DemonMovement : MonoBehaviour
     void OnCollisionEnter(Collision collision) {
         if (collision.gameObject.CompareTag("Ground")) {
             isGrounded = true;
-            MAnimator.SetBool("isGround", true);
+            MAnimator.SetBool("isGrounded", true);
         }
     }
 
     void OnCollisionExit(Collision collision) {
         if (collision.gameObject.CompareTag("Ground")) {
             isGrounded = false;
-            MAnimator.SetBool("isGround", false);
+            MAnimator.SetBool("isGrounded", false);
         }
     }
 }
