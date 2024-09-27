@@ -23,6 +23,7 @@ public class DemonMovement : MonoBehaviour
         mCameraTransform = GameObject.FindWithTag("MainCamera").GetComponent<Camera>().transform;
         mRb = gameObject.GetComponent<Rigidbody>();
         MAnimator = gameObject.GetComponent<Animator>();
+        
     }
 
     void Update() {
@@ -35,23 +36,42 @@ public class DemonMovement : MonoBehaviour
         Vector3 mRight = transform.right;
         Vector3 mForward = transform.forward;
         Vector3 mMovement = (mMoveHorizontal * mRight + mMoveVertical * mForward).normalized;
+        mRb.MovePosition(transform.position + MPlayerSpeed * Time.deltaTime * mMovement);
 
-        if(mStateInfo.IsName("Stand To Roll")) {
-            mRb.MovePosition(transform.position + 10.0f * Time.deltaTime * mForward);
-        }
         if(Input.GetKeyDown(KeyCode.LeftShift)) {
             MAnimator.SetBool("isShift", true);
         }
         else if(Input.GetKeyUp(KeyCode.LeftShift)) {
             MAnimator.SetBool("isShift", false);
         }
+        if(mStateInfo.IsName("Stand To Roll")) {
+            mRb.MovePosition(transform.position + 10.0f * Time.deltaTime * mForward.normalized);
+            MAnimator.speed = 1.3f;
+        }
+        else {
+            MAnimator.speed = 1.0f;
+        }
         float speed = new Vector3(mMoveHorizontal, 0, mMoveVertical).magnitude;
 
         MAnimator.SetFloat("speed", speed);
-        MAnimator.SetBool("isWalking", speed > 0.0f);
 
-        if (speed > 0.0f) {
-            mRb.MovePosition(transform.position + MPlayerSpeed * Time.deltaTime * mMovement);
+        if (Input.GetKey(KeyCode.W)) {
+            MAnimator.SetBool("isWalking", true);
+        }
+        else {
+            MAnimator.SetBool("isWalking", false);
+        }
+        if (Input.GetKey(KeyCode.S)) {
+            MAnimator.SetBool("isWalkingBackward", true);
+        }
+        else {
+            MAnimator.SetBool("isWalkingBackward", false);
+        }
+        if(Input.GetMouseButton(0)) {
+            MAnimator.SetBool("isAttack", true);
+        }
+        else {
+            MAnimator.SetBool("isAttack", false);
         }
 
         mRotationX -= mMoveMouseY;
